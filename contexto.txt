@@ -1,0 +1,7 @@
+Definición del problema
+
+El usuario del sistema es un técnico en refrigeración que realiza instalaciones, reparaciones y servicios periódicos de manera independiente. Actualmente gestiona su trabajo utilizando únicamente su memoria personal y conversaciones por WhatsApp, sin un registro estructurado de clientes ni de los equipos instalados o reparados.
+
+El problema principal es la falta de un registro histórico de clientes, trabajos realizados y fechas relevantes (como instalaciones o últimos servicios), lo que impide al técnico identificar cuándo corresponde realizar mantenimientos preventivos o retomar contacto con clientes anteriores.
+
+Como consecuencia, se pierden oportunidades de trabajo recurrente (como servicios técnicos programados o seguimientos post-instalación) generando una pérdida directa de posibles ingresos y desaprovechando una base de clientes que ya confió previamente en el servicio.

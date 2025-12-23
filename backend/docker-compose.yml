@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    container_name: climax_backend_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
