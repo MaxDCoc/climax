@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date
+from app.models.servicio import TipoServicioEnum
 
 class ServicioBase(BaseModel):
-    tipo_servicio: str
-    fecha_servicio: date
+    tipo_servicio: TipoServicioEnum
+    fecha_serv: date
     observaciones: Optional[str] = None
-    proximo_servicio: date
+    fecha_prox_serv: Optional[date] = None
 
 class ServicioCreate(ServicioBase):
     pass
