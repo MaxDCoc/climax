@@ -10,5 +10,5 @@ class AireAcondicionado(Equipo):
     tipo_aire = Column(String, nullable=True)
 
     __mapper_args__ = {
-        "polymorphic_identity": "aire acondicionado",
+        "polymorphic_identity": "aire",
     }
