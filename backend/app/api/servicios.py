@@ -1,15 +1,32 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
+from datetime import date, timedelta
 
 from app.db.dependencies import get_db
 from app.models.servicio import Servicio
 from app.models.equipo import Equipo
 from app.schemas.servicio import ServicioCreate, ServicioResponse
+from app.services.proxServ_logic import calcular_fecha_proximo_servicio
 
 router = APIRouter(
     prefix="/api/v1",
     tags=["Servicios"]
 )
+
+@router.get("/servicios/oportunidades")
+def oportunidades_servicio(
+    dias: int = 30,
+    db: Session = Depends(get_db)
+):
+    fecha_limite = date.today() + timedelta(days=dias)
+    servicios_oportunidad = db.query(Servicio).filter(
+        and_(
+            Servicio.fecha_prox_serv != None,
+            Servicio.fecha_prox_serv <= fecha_limite
+        )
+    ).all()
+    return servicios_oportunidad
 
 @router.post("/equipos/{equipo_id}/servicios", 
              response_model=ServicioResponse, 
@@ -28,7 +45,7 @@ def crear_servicio(
         tipo_servicio=servicio.tipo_servicio,
         fecha_serv=servicio.fecha_serv,
         observaciones=servicio.observaciones,
-        fecha_prox_serv=servicio.fecha_prox_serv,
+        fecha_prox_serv=calcular_fecha_proximo_servicio(servicio.fecha_serv, servicio.tipo_servicio),
         equipo_id=equipo_id
     )
 
