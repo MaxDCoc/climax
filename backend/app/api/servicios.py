@@ -1,32 +1,64 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from datetime import date, timedelta
 
 from app.db.dependencies import get_db
+from app.api.deps import get_current_user
 from app.models.servicio import Servicio
 from app.models.equipo import Equipo
 from app.schemas.servicio import ServicioCreate, ServicioResponse
+from app.schemas.oportunidad import OportunidadResponse, ClienteMini, EquipoMini
 from app.services.proxServ_logic import calcular_fecha_proximo_servicio
 
 router = APIRouter(
     prefix="/api/v1",
-    tags=["Servicios"]
+    tags=["Servicios"],
+    dependencies=[Depends(get_current_user)],
 )
 
-@router.get("/servicios/oportunidades")
+@router.get("/servicios/oportunidades", response_model=list[OportunidadResponse])
 def oportunidades_servicio(
     dias: int = 30,
     db: Session = Depends(get_db)
 ):
     fecha_limite = date.today() + timedelta(days=dias)
-    servicios_oportunidad = db.query(Servicio).filter(
-        and_(
-            Servicio.fecha_prox_serv != None,
-            Servicio.fecha_prox_serv <= fecha_limite
+
+    ultimo_servicio_por_equipo = (
+        db.query(
+            Servicio.equipo_id.label("equipo_id"),
+            func.max(Servicio.fecha_serv).label("max_fecha_serv"),
         )
-    ).all()
-    return servicios_oportunidad
+        .group_by(Servicio.equipo_id)
+        .subquery()
+    )
+
+    servicios_oportunidad = (
+        db.query(Servicio)
+        .join(
+            ultimo_servicio_por_equipo,
+            and_(
+                Servicio.equipo_id == ultimo_servicio_por_equipo.c.equipo_id,
+                Servicio.fecha_serv == ultimo_servicio_por_equipo.c.max_fecha_serv,
+            ),
+        )
+        .filter(
+            Servicio.fecha_prox_serv != None,
+            Servicio.fecha_prox_serv <= fecha_limite,
+        )
+        .all()
+    )
+
+    return [
+        OportunidadResponse(
+            servicio_id=servicio.id,
+            tipo_servicio=servicio.tipo_servicio,
+            fecha_proximo_servicio=servicio.fecha_prox_serv,
+            cliente=ClienteMini.model_validate(servicio.equipo.cliente),
+            equipo=EquipoMini.model_validate(servicio.equipo),
+        )
+        for servicio in servicios_oportunidad
+    ]
 
 @router.post("/equipos/{equipo_id}/servicios", 
              response_model=ServicioResponse, 
@@ -107,7 +139,9 @@ def actualizar_servicio(
     servicio.tipo_servicio = servicio_actualizado.tipo_servicio
     servicio.fecha_serv = servicio_actualizado.fecha_serv
     servicio.observaciones = servicio_actualizado.observaciones
-    servicio.fecha_prox_serv = servicio_actualizado.fecha_prox_serv
+    servicio.fecha_prox_serv = calcular_fecha_proximo_servicio(
+        servicio_actualizado.fecha_serv, servicio_actualizado.tipo_servicio
+    )
 
     db.commit()
     db.refresh(servicio)

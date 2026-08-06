@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.dependencies import get_db
+from app.api.deps import get_current_user
 from app.models.cliente import Cliente
 from app.schemas.cliente import ClienteCreate, ClienteResponse
 
 router = APIRouter(
     prefix="/api/v1/clientes",
     tags=["Clientes"],
+    dependencies=[Depends(get_current_user)],
 )
 
 @router.post(
@@ -18,7 +20,7 @@ def crear_cliente(
     cliente: ClienteCreate,
     db: Session = Depends(get_db),
 ):
-    nuevo_cliente = Cliente(**cliente.dict())
+    nuevo_cliente = Cliente(**cliente.model_dump())
     db.add(nuevo_cliente)
     db.commit()
     db.refresh(nuevo_cliente)
@@ -65,7 +67,7 @@ def actualizar_cliente(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Cliente no encontrado"
         )
-    for key, value in cliente.dict().items():
+    for key, value in cliente.model_dump().items():
         setattr(cliente_actualizado, key, value)
     db.commit()
     db.refresh(cliente_actualizado)

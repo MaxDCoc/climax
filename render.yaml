@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: climax-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWT_AUD
+        value: authenticated
+      - key: ENVIRONMENT
+        value: production
+      - key: SQL_ECHO
+        value: "false"
+      - key: FRONTEND_URL
+        sync: false

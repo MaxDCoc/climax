@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
 class ClienteBase(BaseModel):
     nombre: str
-    direccion: str
+    direccion: Optional[str] = None
     telefono: str
     observaciones: Optional[str] = None
 
@@ -11,7 +11,6 @@ class ClienteCreate(ClienteBase):
     pass
 
 class ClienteResponse(ClienteBase):
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    id: int

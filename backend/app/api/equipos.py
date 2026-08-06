@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Union
 
 from app.db.dependencies import get_db
+from app.api.deps import get_current_user
 from app.models.cliente import Cliente
 from app.models.ac import AireAcondicionado
 from app.models.heladera import Heladera
@@ -23,6 +24,7 @@ from typing import Union
 router = APIRouter(
     prefix="/api/v1",
     tags=["Equipos"],
+    dependencies=[Depends(get_current_user)],
 )
 
 
@@ -113,7 +115,7 @@ def obtener_equipo(equipo_id: int, db: Session = Depends(get_db)):
 
 
 
-@router.put("/{equipo_id}", response_model=EquipoResponse)
+@router.put("/equipos/{equipo_id}", response_model=EquipoResponse)
 def actualizar_equipo(
     equipo_id: int,
     data: EquipoUpdate,
@@ -124,7 +126,7 @@ def actualizar_equipo(
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
-    for campo, valor in data.dict(exclude_unset=True).items():
+    for campo, valor in data.model_dump(exclude_unset=True).items():
         setattr(equipo, campo, valor)
 
     db.commit()

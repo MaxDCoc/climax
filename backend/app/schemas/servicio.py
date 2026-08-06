@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import date
 from app.models.servicio import TipoServicioEnum
@@ -13,8 +13,7 @@ class ServicioCreate(ServicioBase):
     pass
 
 class ServicioResponse(ServicioBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     equipo_id: int
-
-    class Config:
-        orm_mode = True
