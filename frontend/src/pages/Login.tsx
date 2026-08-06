@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { LogoMark } from '../components/icons'
+import { btnPrimary, input, label as labelClass } from '../lib/ui'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -23,45 +25,53 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 dark:bg-gray-950">
+    <div className="flex min-h-screen flex-col items-center justify-center p-6">
+      <div className="mb-8 flex flex-col items-center gap-3">
+        <div className="rounded-2xl border border-ice-500/20 bg-navy-800/60 p-4 shadow-[0_0_40px_-8px_rgba(34,211,238,0.35)]">
+          <LogoMark className="h-12 w-12" />
+        </div>
+        <div className="text-center">
+          <p className="font-display text-2xl font-bold tracking-tight text-slate-50">Climax</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-ice-400/70">
+            Refrigeraciones
+          </p>
+        </div>
+      </div>
+
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-sm dark:bg-gray-900"
+        className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-navy-800/60 p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.7)] backdrop-blur-sm"
       >
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Iniciar sesión
-        </h1>
-
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          autoComplete="username"
-          required
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          autoComplete="current-password"
-          required
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
+        <div>
+          <label className={labelClass}>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            required
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Contraseña</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+            className={input}
+          />
+        </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          <p role="alert" className="text-sm text-red-400">
             {error}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-blue-600 py-3 text-base font-medium text-white active:bg-blue-700 disabled:opacity-60"
-        >
+        <button type="submit" disabled={loading} className={`w-full ${btnPrimary}`}>
           {loading ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>

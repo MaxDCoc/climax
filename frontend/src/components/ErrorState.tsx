@@ -1,3 +1,6 @@
+import { IconAlertTriangle } from './icons'
+import { btnSecondary } from '../lib/ui'
+
 export function ErrorState({
   message,
   onRetry,
@@ -6,15 +9,13 @@ export function ErrorState({
   onRetry?: () => void
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 p-8 text-center">
-      <p className="text-red-600 dark:text-red-400">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-red-500/15 bg-red-500/5 p-8 text-center">
+      <IconAlertTriangle className="h-8 w-8 text-red-400" />
+      <p className="text-sm text-red-300">
         {message ?? 'No se pudo conectar. Revisá tu conexión e intentá de nuevo.'}
       </p>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white active:bg-blue-700"
-        >
+        <button onClick={onRetry} className={btnSecondary}>
           Reintentar
         </button>
       )}

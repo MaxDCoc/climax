@@ -5,15 +5,13 @@ import { LoadingState } from '../components/LoadingState'
 import { serviciosApi } from '../api/servicios'
 import { ApiError } from '../lib/apiClient'
 import type { TipoServicio } from '../types'
+import { btnPrimary, heading, input, label as labelClass } from '../lib/ui'
 
 const TIPO_LABEL: Record<TipoServicio, string> = {
   INSTALACION: 'Instalación',
   SERVICE: 'Service',
   REPARACION: 'Reparación',
 }
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
 
 export default function ServicioForm() {
   const { equipoId, id } = useParams()
@@ -73,53 +71,62 @@ export default function ServicioForm() {
   if (loading) {
     return (
       <Layout>
-        <LoadingState />
+        <LoadingState rows={1} />
       </Layout>
     )
   }
 
   return (
     <Layout>
-      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className={`mb-4 text-lg ${heading}`}>
         {editando ? 'Editar servicio' : 'Registrar servicio'}
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <select
-          value={tipoServicio}
-          onChange={(e) => setTipoServicio(e.target.value as TipoServicio)}
-          className={inputClass}
-        >
-          {(Object.keys(TIPO_LABEL) as TipoServicio[]).map((t) => (
-            <option key={t} value={t}>
-              {TIPO_LABEL[t]}
-            </option>
-          ))}
-        </select>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className={labelClass}>Tipo de servicio</label>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(TIPO_LABEL) as TipoServicio[]).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTipoServicio(t)}
+                className={`rounded-xl border px-2 py-2.5 text-center text-xs font-medium transition ${
+                  tipoServicio === t
+                    ? 'border-ice-500/50 bg-ice-500/10 text-ice-300'
+                    : 'border-white/10 bg-navy-900/40 text-slate-400'
+                }`}
+              >
+                {TIPO_LABEL[t]}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <input
-          type="date"
-          value={fechaServ}
-          onChange={(e) => setFechaServ(e.target.value)}
-          required
-          className={inputClass}
-        />
+        <div>
+          <label className={labelClass}>Fecha</label>
+          <input
+            type="date"
+            value={fechaServ}
+            onChange={(e) => setFechaServ(e.target.value)}
+            required
+            className={input}
+          />
+        </div>
 
-        <textarea
-          value={observaciones}
-          onChange={(e) => setObservaciones(e.target.value)}
-          placeholder="Observaciones (opcional)"
-          rows={3}
-          className={inputClass}
-        />
+        <div>
+          <label className={labelClass}>Observaciones (opcional)</label>
+          <textarea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            rows={3}
+            className={input}
+          />
+        </div>
 
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-blue-600 py-3 text-base font-medium text-white active:bg-blue-700 disabled:opacity-60"
-        >
+        <button type="submit" disabled={saving} className={`w-full ${btnPrimary}`}>
           {saving ? 'Guardando...' : 'Guardar'}
         </button>
       </form>

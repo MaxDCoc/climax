@@ -4,6 +4,7 @@ import { clientesApi } from '../api/clientes'
 import { Layout } from '../components/Layout'
 import { LoadingState } from '../components/LoadingState'
 import { ApiError } from '../lib/apiClient'
+import { btnPrimary, heading, input, label as labelClass } from '../lib/ui'
 
 export default function ClienteForm() {
   const { id } = useParams()
@@ -60,54 +61,47 @@ export default function ClienteForm() {
   if (loading) {
     return (
       <Layout>
-        <LoadingState />
+        <LoadingState rows={1} />
       </Layout>
     )
   }
 
   return (
     <Layout>
-      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-        {editando ? 'Editar cliente' : 'Nuevo cliente'}
-      </h2>
+      <h2 className={`mb-4 text-lg ${heading}`}>{editando ? 'Editar cliente' : 'Nuevo cliente'}</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          placeholder="Nombre"
-          required
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
-        <input
-          value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
-          placeholder="Teléfono"
-          required
-          inputMode="tel"
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
-        <input
-          value={direccion}
-          onChange={(e) => setDireccion(e.target.value)}
-          placeholder="Dirección (opcional)"
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
-        <textarea
-          value={observaciones}
-          onChange={(e) => setObservaciones(e.target.value)}
-          placeholder="Observaciones (opcional)"
-          rows={3}
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-        />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className={labelClass}>Nombre</label>
+          <input value={nombre} onChange={(e) => setNombre(e.target.value)} required className={input} />
+        </div>
+        <div>
+          <label className={labelClass}>Teléfono</label>
+          <input
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            required
+            inputMode="tel"
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Dirección (opcional)</label>
+          <input value={direccion} onChange={(e) => setDireccion(e.target.value)} className={input} />
+        </div>
+        <div>
+          <label className={labelClass}>Observaciones (opcional)</label>
+          <textarea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            rows={3}
+            className={input}
+          />
+        </div>
 
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-blue-600 py-3 text-base font-medium text-white active:bg-blue-700 disabled:opacity-60"
-        >
+        <button type="submit" disabled={saving} className={`w-full ${btnPrimary}`}>
           {saving ? 'Guardando...' : 'Guardar'}
         </button>
       </form>

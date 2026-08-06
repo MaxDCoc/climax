@@ -5,15 +5,13 @@ import { LoadingState } from '../components/LoadingState'
 import { equiposApi } from '../api/equipos'
 import { ApiError } from '../lib/apiClient'
 import type { TipoEquipo } from '../types'
+import { btnPrimary, heading, input, label as labelClass } from '../lib/ui'
 
 const TIPO_LABEL: Record<TipoEquipo, string> = {
   aire: 'Aire acondicionado',
   heladera: 'Heladera',
   lavarropas: 'Lavarropas',
 }
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 px-3 py-3 text-base dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
 
 export default function EquipoForm() {
   const { clienteId, id } = useParams()
@@ -107,124 +105,131 @@ export default function EquipoForm() {
   if (loading) {
     return (
       <Layout>
-        <LoadingState />
+        <LoadingState rows={1} />
       </Layout>
     )
   }
 
   return (
     <Layout>
-      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-        {editando ? 'Editar equipo' : 'Nuevo equipo'}
-      </h2>
+      <h2 className={`mb-4 text-lg ${heading}`}>{editando ? 'Editar equipo' : 'Nuevo equipo'}</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {!editando && (
-          <select
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value as TipoEquipo)}
-            className={inputClass}
-          >
+          <div className="grid grid-cols-3 gap-2">
             {(Object.keys(TIPO_LABEL) as TipoEquipo[]).map((t) => (
-              <option key={t} value={t}>
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTipo(t)}
+                className={`rounded-xl border px-2 py-2.5 text-center text-xs font-medium transition ${
+                  tipo === t
+                    ? 'border-ice-500/50 bg-ice-500/10 text-ice-300'
+                    : 'border-white/10 bg-navy-900/40 text-slate-400'
+                }`}
+              >
                 {TIPO_LABEL[t]}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         )}
 
-        <input
-          value={marca}
-          onChange={(e) => setMarca(e.target.value)}
-          placeholder="Marca"
-          required
-          className={inputClass}
-        />
-        <input
-          value={modelo}
-          onChange={(e) => setModelo(e.target.value)}
-          placeholder="Modelo (opcional)"
-          className={inputClass}
-        />
+        <div>
+          <label className={labelClass}>Marca</label>
+          <input value={marca} onChange={(e) => setMarca(e.target.value)} required className={input} />
+        </div>
+        <div>
+          <label className={labelClass}>Modelo (opcional)</label>
+          <input value={modelo} onChange={(e) => setModelo(e.target.value)} className={input} />
+        </div>
 
         {tipo === 'aire' && (
           <>
-            <input
-              value={frigorias}
-              onChange={(e) => setFrigorias(e.target.value)}
-              placeholder="Frigorías"
-              type="number"
-              required
-              className={inputClass}
-            />
-            <input
-              value={tipoAire}
-              onChange={(e) => setTipoAire(e.target.value)}
-              placeholder="Tipo (split, ventana, etc.)"
-              className={inputClass}
-            />
+            <div>
+              <label className={labelClass}>Frigorías</label>
+              <input
+                value={frigorias}
+                onChange={(e) => setFrigorias(e.target.value)}
+                type="number"
+                required
+                className={input}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Tipo (split, ventana, etc.)</label>
+              <input value={tipoAire} onChange={(e) => setTipoAire(e.target.value)} className={input} />
+            </div>
           </>
         )}
 
         {tipo === 'heladera' && (
           <>
-            <input
-              value={capacLitros}
-              onChange={(e) => setCapacLitros(e.target.value)}
-              placeholder="Capacidad (litros)"
-              type="number"
-              required
-              className={inputClass}
-            />
-            <input
-              value={tipoHeladera}
-              onChange={(e) => setTipoHeladera(e.target.value)}
-              placeholder="Tipo de heladera"
-              className={inputClass}
-            />
+            <div>
+              <label className={labelClass}>Capacidad (litros)</label>
+              <input
+                value={capacLitros}
+                onChange={(e) => setCapacLitros(e.target.value)}
+                type="number"
+                required
+                className={input}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Tipo de heladera</label>
+              <input
+                value={tipoHeladera}
+                onChange={(e) => setTipoHeladera(e.target.value)}
+                className={input}
+              />
+            </div>
           </>
         )}
 
         {tipo === 'lavarropas' && (
           <>
-            <input
-              value={capacKilos}
-              onChange={(e) => setCapacKilos(e.target.value)}
-              placeholder="Capacidad (kilos)"
-              type="number"
-              required
-              className={inputClass}
-            />
-            <input
-              value={tipoLavarropas}
-              onChange={(e) => setTipoLavarropas(e.target.value)}
-              placeholder="Tipo de lavarropas"
-              className={inputClass}
-            />
+            <div>
+              <label className={labelClass}>Capacidad (kilos)</label>
+              <input
+                value={capacKilos}
+                onChange={(e) => setCapacKilos(e.target.value)}
+                type="number"
+                required
+                className={input}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Tipo de lavarropas</label>
+              <input
+                value={tipoLavarropas}
+                onChange={(e) => setTipoLavarropas(e.target.value)}
+                className={input}
+              />
+            </div>
           </>
         )}
 
-        <input
-          value={fechaInstalacion}
-          onChange={(e) => setFechaInstalacion(e.target.value)}
-          type="date"
-          className={inputClass}
-        />
-        <textarea
-          value={observaciones}
-          onChange={(e) => setObservaciones(e.target.value)}
-          placeholder="Observaciones (opcional)"
-          rows={3}
-          className={inputClass}
-        />
+        <div>
+          <label className={labelClass}>Fecha de instalación</label>
+          <input
+            value={fechaInstalacion}
+            onChange={(e) => setFechaInstalacion(e.target.value)}
+            type="date"
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Observaciones (opcional)</label>
+          <textarea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            rows={3}
+            className={input}
+          />
+        </div>
 
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-blue-600 py-3 text-base font-medium text-white active:bg-blue-700 disabled:opacity-60"
-        >
+        <button type="submit" disabled={saving} className={`w-full ${btnPrimary}`}>
           {saving ? 'Guardando...' : 'Guardar'}
         </button>
       </form>

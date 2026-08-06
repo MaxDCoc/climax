@@ -6,11 +6,28 @@ import { useApi } from '../hooks/useApi'
 import { clientesApi } from '../api/clientes'
 import { equiposApi } from '../api/equipos'
 import { whatsappHref } from '../lib/whatsapp'
+import { btnDanger, btnPrimary, btnSecondary, card, cardInteractive, heading } from '../lib/ui'
+import {
+  IconChevronRight,
+  IconEdit,
+  IconFridge,
+  IconPlus,
+  IconTrash,
+  IconWasher,
+  IconWhatsapp,
+  IconWind,
+} from '../components/icons'
 
 const TIPO_LABEL: Record<string, string> = {
   aire: 'Aire acondicionado',
   heladera: 'Heladera',
   lavarropas: 'Lavarropas',
+}
+
+const TIPO_ICON: Record<string, typeof IconWind> = {
+  aire: IconWind,
+  heladera: IconFridge,
+  lavarropas: IconWasher,
 }
 
 export default function ClienteDetalle() {
@@ -30,7 +47,7 @@ export default function ClienteDetalle() {
   if (cliente.loading) {
     return (
       <Layout>
-        <LoadingState />
+        <LoadingState rows={1} />
       </Layout>
     )
   }
@@ -47,74 +64,69 @@ export default function ClienteDetalle() {
 
   return (
     <Layout>
-      <div className="mb-4 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{c.nombre}</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{c.telefono}</p>
-        {c.direccion && (
-          <p className="text-sm text-gray-600 dark:text-gray-400">{c.direccion}</p>
-        )}
-        {c.observaciones && (
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">{c.observaciones}</p>
-        )}
+      <div className={`mb-4 ${card}`}>
+        <h2 className={`text-lg ${heading}`}>{c.nombre}</h2>
+        <p className="text-sm text-slate-400">{c.telefono}</p>
+        {c.direccion && <p className="text-sm text-slate-400">{c.direccion}</p>}
+        {c.observaciones && <p className="mt-2 text-sm text-slate-500">{c.observaciones}</p>}
 
-        <div className="mt-3 flex gap-2">
+        <div className="mt-4 flex gap-2">
           <a
             href={whatsappHref(c.telefono)}
             target="_blank"
             rel="noreferrer"
-            className="flex-1 rounded-lg bg-green-600 py-2 text-center text-sm font-medium text-white active:bg-green-700"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/15 px-3 py-2.5 text-sm font-medium text-[#25D366] transition active:scale-[0.97] active:bg-[#25D366]/25"
           >
+            <IconWhatsapp />
             WhatsApp
           </a>
-          <Link
-            to={`/clientes/${c.id}/editar`}
-            className="flex-1 rounded-lg bg-gray-200 py-2 text-center text-sm font-medium text-gray-800 active:bg-gray-300 dark:bg-gray-800 dark:text-gray-100"
-          >
+          <Link to={`/clientes/${c.id}/editar`} className={`flex-1 ${btnSecondary}`}>
+            <IconEdit />
             Editar
           </Link>
-          <button
-            onClick={handleEliminar}
-            className="flex-1 rounded-lg bg-red-100 py-2 text-sm font-medium text-red-700 active:bg-red-200 dark:bg-red-950 dark:text-red-400"
-          >
+          <button onClick={handleEliminar} className={`flex-1 ${btnDanger}`}>
+            <IconTrash />
             Eliminar
           </button>
         </div>
       </div>
 
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100">Equipos</h3>
-        <Link
-          to={`/clientes/${c.id}/equipos/nuevo`}
-          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white active:bg-blue-700"
-        >
-          + Nuevo
+        <h3 className={heading}>Equipos</h3>
+        <Link to={`/clientes/${c.id}/equipos/nuevo`} className={btnPrimary}>
+          <IconPlus />
+          Nuevo
         </Link>
       </div>
 
-      {equipos.loading && <LoadingState />}
+      {equipos.loading && <LoadingState rows={2} />}
       {equipos.error && <ErrorState message={equipos.error} onRetry={equipos.reload} />}
       {!equipos.loading && !equipos.error && equipos.data?.length === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400">
+        <p className="py-6 text-center text-sm text-slate-500">
           Este cliente todavía no tiene equipos registrados.
         </p>
       )}
 
-      <ul className="space-y-2">
-        {equipos.data?.map((equipo) => (
-          <li key={equipo.id}>
-            <Link
-              to={`/equipos/${equipo.id}`}
-              className="block rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900"
-            >
-              <p className="font-medium text-gray-900 dark:text-gray-100">
-                {TIPO_LABEL[equipo.tipo]}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {equipo.marca} {equipo.modelo ?? ''}
-              </p>
-            </Link>
-          </li>
-        ))}
+      <ul className="space-y-2.5">
+        {equipos.data?.map((equipo) => {
+          const TipoIcon = TIPO_ICON[equipo.tipo] ?? IconWind
+          return (
+            <li key={equipo.id}>
+              <Link to={`/equipos/${equipo.id}`} className={`${cardInteractive} flex items-center gap-3`}>
+                <div className="rounded-xl bg-ice-500/10 p-2 text-ice-400">
+                  <TipoIcon />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-slate-100">{TIPO_LABEL[equipo.tipo]}</p>
+                  <p className="truncate text-sm text-slate-500">
+                    {equipo.marca} {equipo.modelo ?? ''}
+                  </p>
+                </div>
+                <IconChevronRight className="shrink-0 text-slate-600" />
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </Layout>
   )

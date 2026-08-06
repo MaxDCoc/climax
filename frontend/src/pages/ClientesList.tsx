@@ -4,6 +4,17 @@ import { LoadingState } from '../components/LoadingState'
 import { ErrorState } from '../components/ErrorState'
 import { useApi } from '../hooks/useApi'
 import { clientesApi } from '../api/clientes'
+import { btnPrimary, cardInteractive, heading } from '../lib/ui'
+import { IconPlus, IconUsers, IconChevronRight } from '../components/icons'
+
+function iniciales(nombre: string) {
+  return nombre
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join('')
+}
 
 export default function ClientesList() {
   const { data, loading, error, reload } = useApi(() => clientesApi.list(), [])
@@ -11,12 +22,10 @@ export default function ClientesList() {
   return (
     <Layout>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Clientes</h2>
-        <Link
-          to="/clientes/nuevo"
-          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white active:bg-blue-700"
-        >
-          + Nuevo
+        <h2 className={`text-lg ${heading}`}>Clientes</h2>
+        <Link to="/clientes/nuevo" className={btnPrimary}>
+          <IconPlus />
+          Nuevo
         </Link>
       </div>
 
@@ -24,20 +33,24 @@ export default function ClientesList() {
       {error && <ErrorState message={error} onRetry={reload} />}
 
       {!loading && !error && data && data.length === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400">
-          Todavía no hay clientes registrados.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-12 text-center">
+          <IconUsers className="h-10 w-10 text-slate-600" />
+          <p className="text-sm text-slate-500">Todavía no hay clientes registrados.</p>
+        </div>
       )}
 
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {data?.map((cliente) => (
           <li key={cliente.id}>
-            <Link
-              to={`/clientes/${cliente.id}`}
-              className="block rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900"
-            >
-              <p className="font-medium text-gray-900 dark:text-gray-100">{cliente.nombre}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{cliente.telefono}</p>
+            <Link to={`/clientes/${cliente.id}`} className={`${cardInteractive} flex items-center gap-3`}>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-ice-400/20 to-ice-600/20 text-sm font-semibold text-ice-300">
+                {iniciales(cliente.nombre)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-slate-100">{cliente.nombre}</p>
+                <p className="text-sm text-slate-500">{cliente.telefono}</p>
+              </div>
+              <IconChevronRight className="shrink-0 text-slate-600" />
             </Link>
           </li>
         ))}
